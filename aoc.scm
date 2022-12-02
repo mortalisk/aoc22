@@ -11,4 +11,10 @@
               (loop (cons next-line lines) ; else loop, keeping this line
                     (read-line))))))))       ; and move to next one the file's contents
 
+
+(define (insp val)
+  (display val)
+  val)
+
+
 (provide (all-defined-out))
