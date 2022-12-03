@@ -1,5 +1,5 @@
 #lang racket
-(require "../aoc.scm")
+(require "../aoc.rkt")
 
 (define make-totals 
   (lambda (lines)
