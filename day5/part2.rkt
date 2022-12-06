@@ -1,60 +1,30 @@
 #lang racket
 (require "../aoc.rkt")
 
-(define (countstacks lines heigth)
-  (if
-   (number? (string->number (first (string-split (first lines)))))
-   (values
-    (length (string-split (first lines)))
-    heigth)
-   (countstacks (rest lines) (+ 1 heigth))))
-      
-
-(define (fillstacks lines stacks n)
-  (if (= n 0)
-   stacks
-   (let* ([as-list (string->list (first lines))]
-          [elems (map first (sliding (rest as-list) 4))])
-     (fillstacks (rest lines) (cons elems stacks) (- n 1)))))
-  
-
-(define (readstacks lines)
-  (let*-values ([(n h) (countstacks lines 0)]
-                [(stacks) (fillstacks lines '() n)])
-    stacks))
-
-(define (readmoves lines)
-  (let loop ([lines lines][acc '()])
-    (if (null? lines)
-        (reverse acc)
-        (match (regexp-match #rx"move ([0-9]+) from ([0-9]+) to ([0-9]+)" (first lines))
-          [#f (loop (rest lines) acc)]
-          [(list _ a b c) (loop (rest lines) (cons (map string->number (list a b c)) acc))]))))
-
 (define (transpose xss)
   (apply map list xss))
 
 (define (move-n stacks n from to)
-  (insp stacks)
-  (let* ([from (- from 1)]
-         [to (- to 1)]
-         [from-stack (list-ref stacks from)]
-         [to-stack (list-ref stacks to)]
-         [items (take from-stack n)]
-         [removed (list-set stacks from (drop from-stack n))]
-         [added-back (list-set removed to (append items to-stack))])
-  added-back))
+  stacks
+  (let* ([items (take (list-ref stacks from) n)]
+         [removed (list-set stacks from (drop (list-ref stacks from) n))])
+    (list-set removed to (append items (list-ref stacks to)))))
 
-(define (move inst stacks)
-  (move-n stacks (first inst) (second inst) (third inst)))
+(define (move line stacks)
+  (match (regexp-match #rx"move ([0-9]+) from ([0-9]+) to ([0-9]+)" line)
+          [#f stacks]
+          [(list _ a b c) (let loop ([a (string->number a)][b (- (string->number b) 1)][c (- (string->number c) 1)])
+                            (move-n stacks a b c))]))
 
-(define (remove-spaces list)
-  (filter (negate (curry char=? #\space)) list))
+(define (readstacks lines)
+  (let* ([by-line (map (curry map first) (map (curryr sliding 4)  (map (curryr drop 1) (map string->list (filter (curryr string-contains? "[") lines)))))]
+         [by-column (transpose by-line)]
+         [no-spaces (map (curry filter (negate (curry char=? #\space))) by-column)])
+  no-spaces))
 
 (define (solve lines)
-  (let* ([stacks (map reverse (map remove-spaces (transpose (readstacks lines))))]
-         [moves (insp (readmoves lines))]
-         [after-moves (foldl move stacks moves)])
+  (let* ([stacks (readstacks lines)]
+         [after-moves (foldl move stacks lines)])
     (list->string (map first after-moves))))
 
 (call-with-lines "input" solve)
