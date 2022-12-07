@@ -30,5 +30,7 @@
   (display "\n")
   val)
 
+(define (do-to item . funcs)
+  (foldl (lambda (func item) (func item)) item funcs))
 
 (provide (all-defined-out))

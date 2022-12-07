@@ -6,7 +6,6 @@
 
 (define (calc-dirs current-dir dirs lines)
    (let loop ([current-dir current-dir][dirs dirs][lines lines])
-     ;(if (not (null? lines)) (insp (list (first lines) "->" dirs)) (insp "done"))
      (if (null? lines)
          dirs
          (match (first lines)
@@ -17,5 +16,11 @@
 
 (call-with-lines "input"
                  (lambda (lines)
-                   (let* ([dirs (calc-dirs '() (hash) lines)])
-                     (foldl (lambda (item acc) (if (>= 100000 (cdr item)) (+ acc (cdr item)) acc)) 0 (insp (hash->list dirs))))))
+                   (let* ([dirs (calc-dirs '() (hash) lines)]
+                          [needed (- (hash-ref dirs '("/")) 40000000)])
+                     (do-to dirs
+                       hash->list
+                       (curry map cdr)
+                       (curry filter (curry <= needed))
+                       (curryr sort <)
+                       first))))
