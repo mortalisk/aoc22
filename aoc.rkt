@@ -24,10 +24,19 @@
       (reverse acc)
       (loop (my-drop list n) (cons (my-take list n) acc)))))
 
+(define (transpose xss)
+  (apply map list xss))
 
 (define (insp val)
   (display val)
   (display "\n")
+  val)
+
+(define (inspect msg val)
+  ;(display msg)
+  ;(display ": ")
+  ;(display val)
+  ;(display "\n")
   val)
 
 (define (do-to item . funcs)
