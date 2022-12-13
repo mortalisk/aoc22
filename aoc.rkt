@@ -33,10 +33,10 @@
   val)
 
 (define (inspect msg val)
-  ;(display msg)
-  ;(display ": ")
-  ;(display val)
-  ;(display "\n")
+  (display msg)
+  (display ": ")
+  (display val)
+  (display "\n")
   val)
 
 (define (do-to item . funcs)
