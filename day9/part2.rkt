@@ -33,8 +33,9 @@
                #:result visited)
               ([move moves])
       (let* ([h (add h move)]
-            [ts (foldl (tail-move h t)])
-        (values (cons t visited) h t)))))
+             [ts (for/fold ([h h][res (list)] #:result res) ([t ts])
+                  (values t (cons (tail-move h t) res)))])
+        (values (cons (first ts) visited) h (reverse ts))))))
 
 (define (solve lines)
   (let ([visited (visits lines)])
